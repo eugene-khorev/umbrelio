@@ -14,3 +14,11 @@
 $router->get('/', function () use ($router) {
     return $router->app->version();
 });
+
+$router->group(['prefix' => 'api/v1'], function($app)
+{
+    $app->get('post',   'ApiController@createPost'  );
+    $app->get('rate',   'ApiController@ratePost'    );
+    $app->get('top',    'ApiController@topPosts'    );
+    $app->get('ips',    'ApiController@ipList'      );
+});
