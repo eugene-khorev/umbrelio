@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers;
 
-use App\User;
+use App\Api\V1\ApiService;
 
 class ApiController extends Controller
 {
@@ -16,9 +16,9 @@ class ApiController extends Controller
         //
     }
     
-    public function ipList() 
+    public function ipList(ApiService $api) 
     {
-        $users = User::all();
+        $users = $api->getIpList();
         
         return response()->json($users);
     }

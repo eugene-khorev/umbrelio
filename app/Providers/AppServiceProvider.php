@@ -3,6 +3,7 @@
 namespace App\Providers;
 
 use Illuminate\Support\ServiceProvider;
+use App\Api\V1\ApiService;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -13,6 +14,8 @@ class AppServiceProvider extends ServiceProvider
      */
     public function register()
     {
-        //
+        $this->app->singleton(ApiService::class, function ($app) {
+            return new ApiService();
+        });
     }
 }
