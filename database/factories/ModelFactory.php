@@ -11,7 +11,7 @@
 |
 */
 
-$factory->define(App\Post::class, function (Faker\Generator $faker) {
+$factory->define(App\Models\Author::class, function (Faker\Generator $faker) {
     return [
         'login' => $faker->unique()->firstName,
     ];

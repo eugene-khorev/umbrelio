@@ -11,14 +11,39 @@
 |
 */
 
+use App\Api\V1\ApiService;
+
 $router->get('/', function () use ($router) {
     return $router->app->version();
 });
 
 $router->group(['prefix' => 'api/v1'], function($app)
 {
-    $app->get('post',   'ApiController@createPost'  );
-    $app->get('rate',   'ApiController@ratePost'    );
-    $app->get('top',    'ApiController@topPosts'    );
-    $app->get('ips',    'ApiController@ipList'      );
+    // Creates a new post
+    $app->get('post', function(ApiService $api) {
+        return response()->json(
+            $api->getIpList()
+        );
+    });
+    
+    // Rates a post
+    $app->get('rate', function(ApiService $api) {
+        return response()->json(
+            $api->getIpList()
+        );
+    });
+    
+    // Returns top rated posts
+    $app->get('top', function(ApiService $api) {
+        return response()->json(
+            $api->getIpList()
+        );
+    });
+    
+    // Returns list of IPs used by more than one user
+    $app->get('ips', function(ApiService $api) {
+        return response()->json(
+            $api->getIpList()
+        );
+    });
 });

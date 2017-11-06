@@ -8,7 +8,7 @@
 
 namespace App\Api\V1;
 
-use App\User;
+use App\Models\Author;
 
 /**
  * Description of Service
@@ -24,13 +24,13 @@ class ApiService
     
     public function seedDatabase()
     {
-//        factory(User::class, 100)->create()->each(function ($u) {
-//            $u->posts()->save(factory(App\Post::class)->make());
-//        });
+        factory(Author::class, 100)->create()/*->each(function ($u) {
+            $u->posts()->save(factory(App\Post::class)->make());
+        })*/;
     }
     
     public function getIpList()
     {
-        return User::all();
+        return Author::all();
     }
 }
