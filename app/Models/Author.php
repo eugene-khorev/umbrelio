@@ -27,14 +27,6 @@ class Author extends Model
     }
     
     /**
-     * Get the IPs for the author.
-     */
-    public function ips()
-    {
-        return $this->hasMany('App\Models\Ip');
-    }
-    
-    /**
      * Find an existing or creates a new author record
      * @param string $login
      * @return \App\Models\Author

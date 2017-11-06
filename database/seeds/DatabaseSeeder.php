@@ -29,8 +29,13 @@ class DatabaseSeeder extends Seeder
         
         // Generate login list
         $logins = [];
+        $loginIPs = [];
         for ($i = 0; $i < static::SEED_LOGIN_COUNT; $i++) {
-            $logins[] = $factory->unique()->firstName;
+            $newLogin = $factory->unique()->firstName;
+            $logins[] = $newLogin;
+            $loginIPs[$newLogin] = $factory->randomElements($ips, 
+                    $factory->numberBetween(1, 2)
+                );
         }
         
         // Generate posts
@@ -38,11 +43,12 @@ class DatabaseSeeder extends Seeder
         $startedAt = microtime(true);
         for ($i = 0; $i < static::SEED_POST_COUNT; $i++) {
             // Post creation request
+            $login = $factory->randomElement($logins);
             $request = new Request([], [
                 'title'     => $factory->sentence(3),
                 'content'   => $factory->text,
-                'login'     => $factory->randomElement($logins),
-                'ip'        => $factory->randomElement($ips),
+                'login'     => $login,
+                'ip'        => $factory->randomElement($loginIPs[$login]),
             ]);
             $attributes = $api->createPost($request);
             

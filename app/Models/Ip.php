@@ -25,14 +25,6 @@ class Ip extends Model
     ];
     
     /**
-     * Get the authors for the IP.
-     */
-    public function authors()
-    {
-        return $this->belongsTo('App\Models\Author');
-    }
-    
-    /**
      * Find an existing or creates a new IP record
      * @param string $addr
      * @return \App\Models\Ip

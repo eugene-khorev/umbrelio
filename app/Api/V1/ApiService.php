@@ -1,11 +1,5 @@
 <?php
 
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
-
 namespace App\Api\V1;
 
 use Illuminate\Http\Request;
@@ -13,7 +7,7 @@ use App\Api\ApiServiceInterface;
 use App\Models\{Author, Ip, Post};
 
 /**
- * Description of Service
+ * API service implementation
  *
  * @author eugene
  */
