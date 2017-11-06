@@ -26,11 +26,7 @@ $router->group(['prefix' => 'api/v1'], function($app)
     $app->post('rate', 'ApiController@ratePost');
     
     // Returns top rated posts
-    $app->get('top', function(ApiService $api) {
-        return response()->json(
-            $api->getIpList()
-        );
-    });
+    $app->get('top', 'ApiController@topPosts');
     
     // Returns list of IPs used by more than one user
     $app->get('ips', function(ApiService $api) {

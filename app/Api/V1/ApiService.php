@@ -32,6 +32,8 @@ class ApiService implements ApiServiceInterface
         'rating'    => 'required|integer|min:1|max:5',
     ];
     
+    const TOP_POST_LIMIT = 3;
+    
     public function __construct()
     {
         //
@@ -125,9 +127,18 @@ class ApiService implements ApiServiceInterface
                 : $request->get('rating');
     }
     
-    public function getTopPostList(Request $request): array
+    /**
+     * Returns top rated posts
+     * @return array
+     */
+    public function getTopPostList(): array
     {
-        return Author::all();
+        // Find and return top rated posts
+        return Rate::with('post')
+                ->orderByDesc(\DB::raw('total / num'))
+                ->limit(static::TOP_POST_LIMIT)
+                ->get()
+                ->toArray();
     }
     
     public function getIpList(Request $request): array

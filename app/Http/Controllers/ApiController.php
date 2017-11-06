@@ -42,4 +42,19 @@ class ApiController extends Controller
         // Return result
         return ['rating' => $rating];
     }
+    
+    /**
+     * Returns top rated posts
+     * @param ApiService $api
+     * @param Request $request
+     * @return type
+     */
+    public function topPosts(ApiService $api, Request $request)
+    {
+        // API service call
+        $top = $api->getTopPostList();
+        
+        // Return result
+        return $top;
+    }
 }
