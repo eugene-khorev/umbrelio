@@ -18,7 +18,11 @@ class CreatePostTable extends Migration
             $table->integer('author_id')->unsigned();
             $table->string('title');
             $table->text('content');
+            $table->integer('rating_total')->unsigned();
+            $table->integer('rating_count')->unsigned();
             
+            $table->index('rating_count');
+            $table->index('author_id');
             $table->foreign('author_id')->references('id')->on('authors');
         });
     }

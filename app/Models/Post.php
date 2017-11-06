@@ -9,6 +9,13 @@ class Post extends Model
     
     public $timestamps = false;
     
+    protected $attributes = array(
+        'rating_total' => 0,
+        'rating_count' => 0,
+    );
+
+    protected $appends = ['rating'];
+
     /**
      * The attributes that are mass assignable.
      *
@@ -18,6 +25,8 @@ class Post extends Model
         'author_id',
         'title',
         'content',
+        'rating_total',
+        'rating_count',
     ];
     
     /**
@@ -28,11 +37,10 @@ class Post extends Model
         return $this->belongsTo('App\Models\Author');
     }
     
-    /**
-     * Get the rate for the post.
-     */
-    public function rate()
+    public function getRatingAttribute()
     {
-        return $this->haseOne('App\Models\Rate');
-    }
+        return $this->rating_count
+                ? round($this->rating_total / $this->rating_count, 1)
+                : 0;
+    }    
 }

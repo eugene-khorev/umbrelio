@@ -9,9 +9,8 @@
 namespace App\Api\V1;
 
 use Illuminate\Http\Request;
-use Faker\Factory;
 use App\Api\ApiServiceInterface;
-use App\Models\{Author, Ip, Post, Rate};
+use App\Models\{Author, Ip, Post};
 
 /**
  * Description of Service
@@ -36,9 +35,9 @@ class ApiService implements ApiServiceInterface
         'page'      => 'integer',
     ];
     
-    const TOP_POST_LIMIT = 3;
+    const TOP_POST_LIMIT = 20;
     
-    const IP_LIST_PAGE_SIZE = 3;
+    const IP_LIST_PAGE_SIZE = 200000;
     
     /**
      * Creates a new post
@@ -80,20 +79,18 @@ class ApiService implements ApiServiceInterface
      */
     public function ratePost(Request $request): float
     {
-        // Find/create rate
-        $rate = Rate::firstOrNew([
-            'post_id' => $request->get('post_id')
-        ]);
+        // Increment rating
+        Post::where('id', $request->get('post_id'))
+            ->update([
+                'rating_total' => \DB::raw( 'rating_total + ' .  $request->get('rating')),
+                'rating_count' => \DB::raw( 'rating_count + 1' ),
+            ]);
         
-        // Increment sum and number of all ratings
-        $rate->increment('total', $request->get('rating'));
-        $rate->increment('num');
-        $rate->save();
-        
+        // Find post
+        $post = Post::find($request->get('post_id'));
+
         // Return average rating
-        return $rate->num
-                ? round($rate->total / $rate->num, 1)
-                : $request->get('rating');
+        return $post->rating;
     }
     
     /**
@@ -103,8 +100,9 @@ class ApiService implements ApiServiceInterface
     public function getTopPostList(): array
     {
         // Find and return top rated posts
-        return Rate::with('post')
-                ->orderByDesc(\DB::raw('total / num'))
+        return Post::where('rating_count', '>', 0)
+                ->orderByDesc(\DB::raw('rating_total / rating_count'))
+                ->orderByDesc('rating_count')
                 ->limit(static::TOP_POST_LIMIT)
                 ->get()
                 ->toArray();
@@ -117,73 +115,29 @@ class ApiService implements ApiServiceInterface
      */
     public function getIpList(Request $request): array
     {
-        // Calculate page offset
-        $page = ($request->get('page', 1) - 1);
-        $offset = static::IP_LIST_PAGE_SIZE * $page;
-        
-        // Get page of IP addresses
-        $ips = Ip::select('ip')
-                ->groupBy('ip')
-                ->having(\DB::raw('COUNT(author_id)'), '>', 1)
-                ->orderBY('ip')
-                ->offset($offset)
-                ->limit(static::IP_LIST_PAGE_SIZE)
-                ->get();
-        
-        // Get authors
-        $pairs = Ip::whereIn('ip', $ips)
-                ->leftJoin('authors', 'authors.id', '=', 'ips.author_id')
-                ->orderBY('ip')
+        // Get ip-author pairs
+        $pairs = \DB::table('shared_ip_authors')
+                ->select(['ip', 'login'])
+                ->leftJoin('authors', 'authors.id', '=', 'shared_ip_authors.author_id')
+                ->orderBy('ip')
                 ->get();
         
         // Build resulting array of objects
         $result = [];
-        foreach ($pairs as $author) {
+        foreach ($pairs as $item) {
             // Check if there is no data for the IP
-            if (!isset($result[$author->ip])) {
-                $result[$author->ip] = [
-                    'ip' => $author->ip,
+            if (!isset($result[$item->ip])) {
+                $result[$item->ip] = [
+                    'ip' => $item->ip,
                     'authors' => [],
                 ];
             }
             
             // Add a new author
-            $result[$author->ip]['authors'][] = $author->login;
+            $result[$item->ip]['authors'][] = $item->login;
         }
         
         // Return non-assotiative array
         return array_values($result);
-    }
-    
-    public function seedDatabase()
-    {
-        $factory = Factory::create();
-        
-        $author = new Author;
-        $author->login = $factory->unique()->firstName;
-        $author->save();
-        
-        $ip = new Ip;
-        $ip->fill([
-            'author_id' => $author->id,
-            'ip' => $factory->ipv4,
-        ]);
-        $ip->save();
-        
-        $post = new Post;
-        $post->fill([
-            'author_id' => $author->id,
-            'title' => $factory->sentence(3),
-            'content' => $factory->text,
-        ]);
-        $post->save();
-        
-        $rate = new Rate;
-        $rate->fill([
-            'post_id' => $post->id,
-            'total' => 0,
-            'num' => 0,
-        ]);
-        $rate->save();
     }
 }

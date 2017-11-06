@@ -19,6 +19,20 @@ class CreateIpTable extends Migration
             
             $table->primary(['author_id', 'ip']);
         });
+        
+        \DB::statement('
+            CREATE VIEW shared_ip_authors AS 
+                SELECT 
+                    r.ip,
+                    r.author_id
+                FROM ips r
+                    LEFT JOIN ( 
+                        SELECT ips.ip
+                        FROM ips
+                        GROUP BY ips.ip
+                        HAVING count(*) > 1
+                    ) g ON r.ip = g.ip;
+        ');
     }
 
     /**
@@ -28,6 +42,8 @@ class CreateIpTable extends Migration
      */
     public function down()
     {
+        \DB::statement('DROP VIEW shared_ip_authors');
+        
         Schema::table('ips', function (Blueprint $table) {
             $table->dropPrimary();
         });
