@@ -29,6 +29,10 @@ class CreateRateTable extends Migration
      */
     public function down()
     {
+        Schema::table('rates', function (Blueprint $table) {
+            $table->dropForeign(['post_id']);
+        });
+        
         Schema::dropIfExists('rate');
     }
 }

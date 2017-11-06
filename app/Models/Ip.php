@@ -7,6 +7,8 @@ use Illuminate\Database\Eloquent\Model;
 class Ip extends Model
 {
     
+    public $incrementing = false;
+    
     public $timestamps = false;
     
     /**

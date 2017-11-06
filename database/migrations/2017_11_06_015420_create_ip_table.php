@@ -28,6 +28,10 @@ class CreateIpTable extends Migration
      */
     public function down()
     {
+        Schema::table('ips', function (Blueprint $table) {
+            $table->dropPrimary();
+        });
+        
         Schema::dropIfExists('ip');
     }
 }

@@ -7,6 +7,8 @@ use Illuminate\Database\Eloquent\Model;
 class Rate extends Model
 {
     
+    public $incrementing = false;
+    
     public $timestamps = false;
     
     /**
