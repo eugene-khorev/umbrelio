@@ -17,6 +17,7 @@ class Ip extends Model
      * @var array
      */
     protected $fillable = [
+        'author_id',
         'ip',
     ];
     

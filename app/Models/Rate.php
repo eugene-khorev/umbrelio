@@ -17,6 +17,7 @@ class Rate extends Model
      * @var array
      */
     protected $fillable = [
+        'post_id',
         'total',
         'num',
     ];

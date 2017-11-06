@@ -20,11 +20,7 @@ $router->get('/', function () use ($router) {
 $router->group(['prefix' => 'api/v1'], function($app)
 {
     // Creates a new post
-    $app->get('post', function(ApiService $api) {
-        return response()->json(
-            $api->getIpList()
-        );
-    });
+    $app->post('post', 'ApiController@createPost');
     
     // Rates a post
     $app->get('rate', function(ApiService $api) {
