@@ -51,14 +51,18 @@ class ApiService implements ApiServiceInterface
             'login' => $request->get('login'),
         ]);
         $author->save();
-        
+
         // Find/create author's IP
+        $addr = $request->get('ip', $request->header('REMOTE_ADDR'));
         $ip = Ip::firstOrNew([
-            'author_id' => $author->id,
-            'ip'        => $request->get('ip', $request->header('REMOTE_ADDR')),
+            'ip' => $addr,
         ]);
         $ip->save();
         
+        Ip::whereRaw('array_position(logins, \'' . $author->login . '\') IS NULL')
+                ->whereKey($addr)
+                ->update(['logins' => \DB::raw('logins || ARRAY[\'' . $author->login . '\']')]);
+
         // Create a new post
         $post = new Post;
         $post->fill([
@@ -82,8 +86,8 @@ class ApiService implements ApiServiceInterface
         // Increment rating
         Post::where('id', $request->get('post_id'))
             ->update([
-                'rating_total' => \DB::raw( 'rating_total + ' .  $request->get('rating')),
-                'rating_count' => \DB::raw( 'rating_count + 1' ),
+                'rating_total' => \DB::raw('rating_total + ' .  $request->get('rating')),
+                'rating_count' => \DB::raw('rating_count + 1'),
             ]);
         
         // Find post
@@ -116,28 +120,23 @@ class ApiService implements ApiServiceInterface
     public function getIpList(Request $request): array
     {
         // Get ip-author pairs
-        $pairs = \DB::table('shared_ip_authors')
-                ->select(['ip', 'login'])
-                ->leftJoin('authors', 'authors.id', '=', 'shared_ip_authors.author_id')
+        $pairs = \DB::table('ips')
+                ->select(\DB::raw("ip, array_to_string(logins, ',') AS authors"))
+                ->whereRaw('array_length(logins, 1) > 1')
                 ->orderBy('ip')
+                ->limit(static::IP_LIST_PAGE_SIZE)
                 ->get();
         
         // Build resulting array of objects
         $result = [];
         foreach ($pairs as $item) {
-            // Check if there is no data for the IP
-            if (!isset($result[$item->ip])) {
-                $result[$item->ip] = [
-                    'ip' => $item->ip,
-                    'authors' => [],
-                ];
-            }
-            
-            // Add a new author
-            $result[$item->ip]['authors'][] = $item->login;
+            $result[] = [
+                'ip' => $item->ip,
+                'authors' => explode(',', $item->authors),
+            ];
         }
         
         // Return non-assotiative array
-        return array_values($result);
+        return $result;
     }
 }
