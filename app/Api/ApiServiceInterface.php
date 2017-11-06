@@ -18,7 +18,7 @@ interface ApiServiceInterface
 {
     public function seedDatabase();
     public function createPost(Request $attributes): array;
-    public function ratePost(Request $request): int;
+    public function ratePost(Request $request): float;
     public function getTopPostList(Request $request): array;
     public function getIpList(Request $request): array;
 }

@@ -14,9 +14,9 @@ class CreateRateTable extends Migration
     public function up()
     {
         Schema::create('rates', function (Blueprint $table) {
-            $table->integer('post_id')->unsigned();
-            $table->integer('total')->unsigned();
-            $table->integer('num')->unsigned();
+            $table->integer('post_id')->unsigned()->primary();
+            $table->integer('total')->unsigned()->default(0);
+            $table->integer('num')->unsigned()->default(0);
             
             $table->foreign('post_id')->references('id')->on('posts');
         });

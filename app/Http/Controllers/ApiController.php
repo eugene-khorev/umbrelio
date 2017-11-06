@@ -24,4 +24,22 @@ class ApiController extends Controller
         // Return result
         return $attributes;
     }
+    
+    /**
+     * Rates a post
+     * @param ApiService $api
+     * @param Request $request
+     * @return type
+     */
+    public function ratePost(ApiService $api, Request $request)
+    {
+        // Validation
+        $this->validate($request, $api::VALIDATE_RATE);
+        
+        // API service call
+        $rating = $api->ratePost($request);
+        
+        // Return result
+        return ['rating' => $rating];
+    }
 }

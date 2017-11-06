@@ -23,11 +23,7 @@ $router->group(['prefix' => 'api/v1'], function($app)
     $app->post('post', 'ApiController@createPost');
     
     // Rates a post
-    $app->get('rate', function(ApiService $api) {
-        return response()->json(
-            $api->getIpList()
-        );
-    });
+    $app->post('rate', 'ApiController@ratePost');
     
     // Returns top rated posts
     $app->get('top', function(ApiService $api) {

@@ -27,6 +27,11 @@ class ApiService implements ApiServiceInterface
         'ip'        => 'ip',
     ];
     
+    const VALIDATE_RATE = [
+        'post_id'   => 'required|exists:posts,id',
+        'rating'    => 'required|integer|min:1|max:5',
+    ];
+    
     public function __construct()
     {
         //
@@ -97,9 +102,27 @@ class ApiService implements ApiServiceInterface
         return $post->toArray();
     }
     
-    public function ratePost(Request $request): int
+    /**
+     * Saves rate and returns resulting rating
+     * @param Request $request
+     * @return float
+     */
+    public function ratePost(Request $request): float
     {
-        return Author::all();
+        // Find/create rate
+        $rate = Rate::firstOrNew([
+            'post_id' => $request->get('post_id')
+        ]);
+        
+        // Increment sum and number of all ratings
+        $rate->increment('total', $request->get('rating'));
+        $rate->increment('num');
+        $rate->save();
+        
+        // Return average rating
+        return $rate->num
+                ? round($rate->total / $rate->num, 1)
+                : $request->get('rating');
     }
     
     public function getTopPostList(Request $request): array

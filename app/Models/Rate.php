@@ -7,9 +7,16 @@ use Illuminate\Database\Eloquent\Model;
 class Rate extends Model
 {
     
+    protected $primaryKey = 'post_id';
+    
     public $incrementing = false;
     
     public $timestamps = false;
+    
+    protected $attributes = array(
+        'total' => 0,
+        'num' => 0,
+    );
     
     /**
      * The attributes that are mass assignable.
