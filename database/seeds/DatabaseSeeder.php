@@ -2,6 +2,8 @@
 
 use Illuminate\Database\Seeder;
 
+use App\Api\V1\ApiService;
+
 class DatabaseSeeder extends Seeder
 {
     /**
@@ -9,8 +11,8 @@ class DatabaseSeeder extends Seeder
      *
      * @return void
      */
-    public function run()
+    public function run(ApiService $api)
     {
-         $this->call('PostTableSeeder');
+         $api->seedDatabase();
     }
 }

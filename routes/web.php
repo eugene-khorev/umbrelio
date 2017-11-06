@@ -11,8 +11,6 @@
 |
 */
 
-use App\Api\V1\ApiService;
-
 $router->get('/', function () use ($router) {
     return $router->app->version();
 });

@@ -40,38 +40,6 @@ class ApiService implements ApiServiceInterface
     
     const IP_LIST_PAGE_SIZE = 3;
     
-    public function seedDatabase()
-    {
-        $factory = Factory::create();
-        
-        $author = new Author;
-        $author->login = $factory->unique()->firstName;
-        $author->save();
-        
-        $ip = new Ip;
-        $ip->fill([
-            'author_id' => $author->id,
-            'ip' => $factory->ipv4,
-        ]);
-        $ip->save();
-        
-        $post = new Post;
-        $post->fill([
-            'author_id' => $author->id,
-            'title' => $factory->sentence(3),
-            'content' => $factory->text,
-        ]);
-        $post->save();
-        
-        $rate = new Rate;
-        $rate->fill([
-            'post_id' => $post->id,
-            'total' => 0,
-            'num' => 0,
-        ]);
-        $rate->save();
-    }
-    
     /**
      * Creates a new post
      * @param Request $request
@@ -185,5 +153,37 @@ class ApiService implements ApiServiceInterface
         
         // Return non-assotiative array
         return array_values($result);
+    }
+    
+    public function seedDatabase()
+    {
+        $factory = Factory::create();
+        
+        $author = new Author;
+        $author->login = $factory->unique()->firstName;
+        $author->save();
+        
+        $ip = new Ip;
+        $ip->fill([
+            'author_id' => $author->id,
+            'ip' => $factory->ipv4,
+        ]);
+        $ip->save();
+        
+        $post = new Post;
+        $post->fill([
+            'author_id' => $author->id,
+            'title' => $factory->sentence(3),
+            'content' => $factory->text,
+        ]);
+        $post->save();
+        
+        $rate = new Rate;
+        $rate->fill([
+            'post_id' => $post->id,
+            'total' => 0,
+            'num' => 0,
+        ]);
+        $rate->save();
     }
 }
