@@ -29,9 +29,5 @@ $router->group(['prefix' => 'api/v1'], function($app)
     $app->get('top', 'ApiController@topPosts');
     
     // Returns list of IPs used by more than one user
-    $app->get('ips', function(ApiService $api) {
-        return response()->json(
-            $api->getIpList()
-        );
-    });
+    $app->get('ips', 'ApiController@ipList');
 });

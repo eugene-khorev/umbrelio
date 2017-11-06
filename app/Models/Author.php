@@ -31,6 +31,6 @@ class Author extends Model
      */
     public function ips()
     {
-        return $this->belongsToMany('App\Models\Ip');
+        return $this->hasMany('App\Models\Ip');
     }
 }

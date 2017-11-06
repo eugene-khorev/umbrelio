@@ -57,4 +57,22 @@ class ApiController extends Controller
         // Return result
         return $top;
     }
+    
+    /**
+     * Returns list of IPs used by more than one user
+     * @param ApiService $api
+     * @param Request $request
+     * @return type
+     */
+    public function ipList(ApiService $api, Request $request)
+    {
+        // Validation
+        $this->validate($request, $api::VALIDATE_IP_LIST);
+        
+        // API service call
+        $list = $api->getIpList($request);
+        
+        // Return result
+        return $list;
+    }
 }

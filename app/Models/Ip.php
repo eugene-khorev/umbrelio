@@ -26,6 +26,6 @@ class Ip extends Model
      */
     public function authors()
     {
-        return $this->belongsToMany('App\Models\Author');
+        return $this->belongsTo('App\Models\Author');
     }
 }

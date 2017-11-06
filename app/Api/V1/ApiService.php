@@ -32,12 +32,13 @@ class ApiService implements ApiServiceInterface
         'rating'    => 'required|integer|min:1|max:5',
     ];
     
+    const VALIDATE_IP_LIST = [
+        'page'      => 'integer',
+    ];
+    
     const TOP_POST_LIMIT = 3;
     
-    public function __construct()
-    {
-        //
-    }
+    const IP_LIST_PAGE_SIZE = 3;
     
     public function seedDatabase()
     {
@@ -141,8 +142,48 @@ class ApiService implements ApiServiceInterface
                 ->toArray();
     }
     
+    /**
+     * Returns list of IPs used by more than one user
+     * @param Request $request
+     * @return array
+     */
     public function getIpList(Request $request): array
     {
-        return Author::all();
+        // Calculate page offset
+        $page = ($request->get('page', 1) - 1);
+        $offset = static::IP_LIST_PAGE_SIZE * $page;
+        
+        // Get page of IP addresses
+        $ips = Ip::select('ip')
+                ->groupBy('ip')
+                ->having(\DB::raw('COUNT(author_id)'), '>', 1)
+                ->orderBY('ip')
+                ->offset($offset)
+                ->limit(static::IP_LIST_PAGE_SIZE)
+                ->get();
+        
+        // Get authors
+        $pairs = Ip::whereIn('ip', $ips)
+                ->leftJoin('authors', 'authors.id', '=', 'ips.author_id')
+                ->orderBY('ip')
+                ->get();
+        
+        // Build resulting array of objects
+        $result = [];
+        foreach ($pairs as $author) {
+            // Check if there is no data for the IP
+            if (!isset($result[$author->ip])) {
+                $result[$author->ip] = [
+                    'ip' => $author->ip,
+                    'authors' => [],
+                ];
+            }
+            
+            // Add a new author
+            $result[$author->ip]['authors'][] = $author->login;
+        }
+        
+        // Return non-assotiative array
+        return array_values($result);
     }
 }
