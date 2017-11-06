@@ -4,7 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
-class Author extends Model
+class Post extends Model
 {
     
     public $timestamps = false;
@@ -15,22 +15,23 @@ class Author extends Model
      * @var array
      */
     protected $fillable = [
-        'login',
+        'title',
+        'content',
     ];
     
     /**
-     * Get the posts for the author.
+     * Get the author that owns the post.
      */
-    public function posts()
+    public function author()
     {
-        return $this->hasMany('App\Model\Post');
+        return $this->belongsTo('App\Models\Author');
     }
     
     /**
-     * Get the IPs for the author.
+     * Get the rate for the post.
      */
-    public function ips()
+    public function rate()
     {
-        return $this->belongsToMany('App\Models\Ip');
+        return $this->haseOne('App\Models\Rate');
     }
 }
