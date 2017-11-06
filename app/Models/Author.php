@@ -33,4 +33,16 @@ class Author extends Model
     {
         return $this->hasMany('App\Models\Ip');
     }
+    
+    /**
+     * Find an existing or creates a new author record
+     * @param string $login
+     * @return \App\Models\Author
+     */
+    public static function findOrCreateByLogin(string $login): Author
+    {
+        $author = static::firstOrNew([ 'login' => $login ]);
+        $author->save();
+        return $author;
+    }
 }

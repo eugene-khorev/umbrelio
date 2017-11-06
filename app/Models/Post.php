@@ -37,10 +37,31 @@ class Post extends Model
         return $this->belongsTo('App\Models\Author');
     }
     
-    public function getRatingAttribute()
+    /**
+     * Generates computed rating property
+     * @return type
+     */
+    public function getRatingAttribute(): float
     {
         return $this->rating_count
                 ? round($this->rating_total / $this->rating_count, 1)
                 : 0;
-    }    
+    }
+    
+    /**
+     * Increment rating fields and return new average rating
+     * @param int $id
+     * @param int $rating
+     * @return type
+     */
+    public static function incrementRatings(int $id, int $rating)
+    {
+        static::where('id', $id)
+            ->update([
+                'rating_total' => \DB::raw('rating_total + ' .  $rating),
+                'rating_count' => \DB::raw('rating_count + 1'),
+            ]);
+        $post = Post::find($id);
+        return $post->rating;
+    }
 }

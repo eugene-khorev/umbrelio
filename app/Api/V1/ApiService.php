@@ -47,21 +47,14 @@ class ApiService implements ApiServiceInterface
     public function createPost(Request $request): array
     {
         // Find/create author
-        $author = Author::firstOrNew([
-            'login' => $request->get('login'),
-        ]);
-        $author->save();
+        $author = Author::findOrCreateByLogin($request->get('login'));
 
         // Find/create author's IP
         $addr = $request->get('ip', $request->header('REMOTE_ADDR'));
-        $ip = Ip::firstOrNew([
-            'ip' => $addr,
-        ]);
-        $ip->save();
+        Ip::findOrCreateByIp($addr);
         
-        Ip::whereRaw('array_position(logins, \'' . $author->login . '\') IS NULL')
-                ->whereKey($addr)
-                ->update(['logins' => \DB::raw('logins || ARRAY[\'' . $author->login . '\']')]);
+        // Update login list for the IP
+        Ip::updateLoginList($addr, $author->login);
 
         // Create a new post
         $post = new Post;
@@ -83,18 +76,11 @@ class ApiService implements ApiServiceInterface
      */
     public function ratePost(Request $request): float
     {
-        // Increment rating
-        Post::where('id', $request->get('post_id'))
-            ->update([
-                'rating_total' => \DB::raw('rating_total + ' .  $request->get('rating')),
-                'rating_count' => \DB::raw('rating_count + 1'),
-            ]);
-        
-        // Find post
-        $post = Post::find($request->get('post_id'));
-
-        // Return average rating
-        return $post->rating;
+        // Increment rating and return new average rating
+        return Post::incrementRatings(
+                $request->get('post_id'),
+                $request->get('rating')
+            );
     }
     
     /**
@@ -119,17 +105,12 @@ class ApiService implements ApiServiceInterface
      */
     public function getIpList(Request $request): array
     {
-        // Get ip-author pairs
-        $pairs = \DB::table('ips')
-                ->select(\DB::raw("ip, array_to_string(logins, ',') AS authors"))
-                ->whereRaw('array_length(logins, 1) > 1')
-                ->orderBy('ip')
-                ->limit(static::IP_LIST_PAGE_SIZE)
-                ->get();
+        // Get shared IP authors
+        $sharedIpAuthors = Ip::getSharedIpAuthors(2, ',');
         
         // Build resulting array of objects
         $result = [];
-        foreach ($pairs as $item) {
+        foreach ($sharedIpAuthors as $item) {
             $result[] = [
                 'ip' => $item->ip,
                 'authors' => explode(',', $item->authors),
