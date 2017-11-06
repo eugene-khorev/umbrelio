@@ -54,6 +54,7 @@ class ApiService implements ApiServiceInterface
         $post = new Post;
         $post->fill([
             'author_id' => $author->id,
+            'ip'        => $addr,
             'title'     => $request->get('title'),
             'content'   => $request->get('content'),
         ]);
