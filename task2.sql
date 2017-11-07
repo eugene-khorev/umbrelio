@@ -20,13 +20,13 @@ INSERT INTO users (group_id)
 SELECT 
 	group_id,
 	MIN(id) AS start_id,
-	COUNT(*) AS num
+	COUNT(*) AS size
 FROM (
 	SELECT 
 		id,
 		group_id,
-		ROW_NUMBER() OVER (ORDER BY id) - ROW_NUMBER() OVER (PARTITION BY group_id ORDER BY id) AS num
+		ROW_NUMBER() OVER (ORDER BY id) - ROW_NUMBER() OVER (PARTITION BY group_id ORDER BY id) AS woffs
 	FROM users
 ) AS result 
-GROUP BY group_id, num
+GROUP BY group_id, woffs
 ORDER BY start_id;
