@@ -12,9 +12,8 @@ class Post extends Model
     protected $attributes = array(
         'rating_total' => 0,
         'rating_count' => 0,
+        'rating' => 0,
     );
-
-    protected $appends = ['rating'];
 
     /**
      * The attributes that are mass assignable.
@@ -36,17 +35,6 @@ class Post extends Model
     public function author()
     {
         return $this->belongsTo('App\Models\Author');
-    }
-    
-    /**
-     * Generates computed rating property
-     * @return type
-     */
-    public function getRatingAttribute(): float
-    {
-        return $this->rating_count
-                ? round($this->rating_total / $this->rating_count, 1)
-                : 0;
     }
     
     /**

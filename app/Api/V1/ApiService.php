@@ -86,8 +86,7 @@ class ApiService implements ApiServiceInterface
     {
         // Find and return top rated posts
         return Post::where('rating_count', '>', 0)
-                ->orderByDesc(\DB::raw('rating_total / rating_count'))
-                ->orderByDesc('rating_count')
+                ->orderByDesc('rating')
                 ->limit(static::TOP_POST_LIMIT)
                 ->get()
                 ->toArray();

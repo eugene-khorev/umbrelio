@@ -44,10 +44,11 @@ class Ip extends Model
      */
     public static function updateLoginList(string $addr, string $login): int
     {
-        return static
-                ::whereRaw('array_position(logins, \'' . $login . '\') IS NULL')
-                ->whereKey($addr)
-                ->update(['logins' => \DB::raw('logins || ARRAY[\'' . $login . '\']')]);
+        return \DB::statement("
+                UPDATE ips SET logins = logins || ARRAY[:login] 
+                WHERE ip = :ip AND array_position(logins, :login) IS NULL
+                ", ['login' => $login, 'ip' => $addr]
+            );
     }
     
     /**
