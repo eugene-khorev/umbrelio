@@ -21,7 +21,7 @@ class ApiService implements ApiServiceInterface
     ];
     
     const VALIDATE_RATE = [
-        'post_id'   => 'required|exists:posts,id',
+        'post_id'   => 'required|integer|exists:posts,id',
         'rating'    => 'required|integer|min:1|max:5',
     ];
     
